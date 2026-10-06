@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3. Countdown Timer Functionality (مضبوط على 5 نوفمبر 2026)
+    // 3. Countdown Timer Functionality (مضبوط على 5 نوفمبر 2026 الساعة 7 مساءً)
     const weddingDate = new Date("2026-11-05T19:00:00").getTime();
 
     function updateCountdown() {
@@ -86,21 +86,20 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
         submitBtn.innerHTML = 'جاري الإرسال... <i class="fa-solid fa-spinner fa-spin"></i>';
 
-        if (SCRIPT_URL) {
-            const formData = new FormData(wishForm);
-            fetch(SCRIPT_URL, { method: 'POST', body: formData })
-                .then(response => {
-                    handleSuccess();
-                })
-                .catch(error => {
-                    console.error('Error!', error.message);
-                    handleSuccess();
-                });
-        } else {
-            setTimeout(() => {
-                handleSuccess();
-            }, 800);
-        }
+        const formData = new FormData(wishForm);
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: formData
+        })
+        .then(() => {
+            handleSuccess();
+        })
+        .catch(error => {
+            console.error('Error!', error.message);
+            handleSuccess();
+        });
     });
 
     function handleSuccess() {
