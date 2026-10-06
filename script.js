@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 3. Countdown Timer Functionality
-    const weddingDate = new Date(2026, 11, 5, 19, 0, 0).getTime();
+    const weddingDate = new Date(2026, 10, 5, 19, 0, 0).getTime();
 
     function updateCountdown() {
         const now = new Date().getTime();
