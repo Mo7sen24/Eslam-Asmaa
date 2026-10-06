@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const successMessage = document.getElementById('success-message');
 
     // رابط Google Apps Script
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxIXNCO4zzEpBRTc0rDbOHRwaIL_qzRGrtoONoAcMRFim8KxEbT0WwOjqHJ6KshiZwsjA/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-7KHr9fttvVmnXiigA89on4N0XjZdhqGdy1hGaFoyg_GjGYtvKvJUfiPVkKPz2LtnrA/exec"; 
 
     let isPlaying = false;
     bgMusic.volume = 0.3;
