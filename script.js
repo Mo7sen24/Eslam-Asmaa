@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. إعدادات رابط Google Apps Script ---
     // استبدل هذا الرابط برابط Web App الخاص بك من Google Apps Script
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZmtocSbyFnW4OadJR5rMK0viqGTiwkSll95mKpfFDHnWTzjNiJIJn2PzT0kj6BUerCw/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHUOn5-YvzjJS-_bDd-ebl7Ii0BD9BcqL07lG4LL722b1SK5M3t1TjyHz67AxUvfJOFA/exec';
 
 
     // --- 2. إدارة تشغيل الصوت ---
@@ -81,18 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
         submitBtn.innerText = 'جاري الإرسال...';
 
-        const payload = {
-            name: name,
-            message: message
-        };
+        // استخدام URLSearchParams لضمان قراءة e.parameter داخل Google Apps Script
+        const formData = new URLSearchParams();
+        formData.append('name', name);
+        formData.append('message', message);
 
         fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', // لضمان إرسال الطلب لـ Apps Script بدون مشاكل Cross-Origin
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
+            body: formData
         })
         .then(() => {
             alert('شكراً لك! تم إرسال تهنئتك بنجاح.');
