@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 3. Countdown Timer Functionality (مضبوط على 5 مايو 2026 الساعة 7 مساءً)
-    const weddingDate = new Date("2026-05-05T19:00:00").getTime();
+    const weddingDate = new Date("2026-11-05T19:00:00").getTime();
 
     function updateCountdown() {
         const now = new Date().getTime();
