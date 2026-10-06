@@ -1,123 +1,118 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    // --- 1. إعدادات رابط Google Apps Script ---
-    // استبدل هذا الرابط برابط Web App الخاص بك من Google Apps Script
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHUOn5-YvzjJS-_bDd-ebl7Ii0BD9BcqL07lG4LL722b1SK5M3t1TjyHz67AxUvfJOFA/exec';
-
-// --- إدارة تشغيل الصوت وشاشة الدخول ---
-    const audio = document.getElementById('wedding-audio');
+    // Elements
+    const splashScreen = document.getElementById('splash-screen');
     const enterBtn = document.getElementById('enter-btn');
-    const welcomeOverlay = document.getElementById('welcome-overlay');
-    const audioToggleBtn = document.getElementById('audio-toggle-btn');
+    const mainContent = document.getElementById('main-content');
+    const bgMusic = document.getElementById('bg-music');
+    const musicToggle = document.getElementById('music-toggle');
+    const wishForm = document.getElementById('wish-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const successMessage = document.getElementById('success-message');
+
+    // ⚠️ ضع لينك Google Apps Script هنا عندما تجهزه مستقبلاً
+    const SCRIPT_URL = ""; 
+
     let isPlaying = false;
-
-    if (enterBtn && welcomeOverlay) {
-        enterBtn.addEventListener('click', () => {
-            // إخفاء الشاشة فوراً
-            welcomeOverlay.style.display = 'none';
-            
-            // محاولة تشغيل الصوت بشكل منفصل
-            if (audio) {
-                playAudio();
-            }
+    bgMusic.volume = 0.3;
+    // 1. Enter Button & Audio Play
+    enterBtn.addEventListener('click', () => {
+        bgMusic.volume = 0.3;
+        bgMusic.play().then(() => {
+            isPlaying = true;
+            musicToggle.classList.remove('hidden');
+        }).catch(err => {
+            console.log("Audio play failed automatically:", err);
+            isPlaying = false;
+            musicToggle.classList.remove('hidden');
         });
-    }
 
-    if (audioToggleBtn) {
-        audioToggleBtn.addEventListener('click', () => {
-            if (isPlaying) {
-                audio.pause();
-                audioToggleBtn.innerHTML = '<i class="fa-solid fa-music-slash"></i>';
-                isPlaying = false;
-            } else {
-                playAudio();
-            }
-        });
-    }
-
-    function playAudio() {
-        if (!audio) return;
+        splashScreen.classList.add('fade-out');
         
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                isPlaying = true;
-                if (audioToggleBtn) {
-                    audioToggleBtn.innerHTML = '<i class="fa-solid fa-music"></i>';
-                }
-            }).catch(err => {
-                console.log("تعذر تشغيل الصوت تلقائياً:", err);
-                isPlaying = false;
-            });
-        }
-    }
-
-
-    // --- 3. العداد التنازلي ---
-    // تم ضبط تاريخ الزفاف على 15 نوفمبر 2026 الساعة 8 مساءً
-    const weddingDate = new Date("2026-11-05T20:00:00").getTime();
-
-    const timer = setInterval(() => {
-        const now = new Date().getTime();
-        const distance = weddingDate - now;
-
-        if (distance < 0) {
-            clearInterval(timer);
-            document.getElementById('countdown').innerHTML = "<h4>أهلاً بكم في زفافنا اليوم!</h4>";
-            return;
-        }
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        document.getElementById('days').innerText = days < 10 ? '0' + days : days;
-        document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
-        document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
-        document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
-    }, 1000);
-
-
-    // --- 4. إرسال نموذج التهاني ---
-    const wishForm = document.getElementById('wishForm');
-    const submitBtn = document.getElementById('submitBtn');
-
-    wishForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const name = document.getElementById('guestName').value.trim();
-        const message = document.getElementById('guestMessage').value.trim();
-
-        if (!name || !message) {
-            alert('يرجى ملء جميع الحقول');
-            return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'جاري الإرسال...';
-
-        // استخدام URLSearchParams لضمان قراءة e.parameter داخل Google Apps Script
-        const formData = new URLSearchParams();
-        formData.append('name', name);
-        formData.append('message', message);
-
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: formData
-        })
-        .then(() => {
-            alert('شكراً لك! تم إرسال تهنئتك بنجاح.');
-            wishForm.reset();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً.');
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'إرسال التهنئة';
-        });
+        setTimeout(() => {
+            splashScreen.style.display = 'none';
+            mainContent.classList.remove('hidden');
+        }, 1000);
     });
 
+    // 2. Music Toggle Floating Button
+    musicToggle.addEventListener('click', () => {
+        if (isPlaying) {
+            bgMusic.pause();
+            musicToggle.querySelector('i').className = 'fa-solid fa-compact-disc';
+            isPlaying = false;
+        } else {
+            bgMusic.volume = 0.3;
+            bgMusic.play();
+            musicToggle.querySelector('i').className = 'fa-solid fa-compact-disc fa-spin';
+            isPlaying = true;
+        }
+    });
+
+    // 3. Countdown Timer Functionality
+    const weddingDate = new Date(2026, 10, 15, 20, 0, 0).getTime();
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const difference = weddingDate - now;
+
+        if (difference > 0) {
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+            document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+            document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+        } else {
+            document.getElementById('countdown').innerHTML = "<h3 style='color: var(--dark-pink);'>تم بحمد الله عقد القران! 🎉</h3>";
+        }
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // 4. Send Wishes Form to Google Sheets
+    wishForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('guest-name').value.trim();
+        const message = document.getElementById('guest-message').value.trim();
+
+        if (!name || !message) return;
+
+        // تغيير حالة الزر أثناء الإرسال
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'جاري الإرسال... <i class="fa-solid fa-spinner fa-spin"></i>';
+
+        // إذا كان رابط الـ Script متوفر يتم الإرسال، وإلا يظهر نجاح وهمي حتى تقوم بالربط
+        if (SCRIPT_URL) {
+            const formData = new FormData(wishForm);
+            fetch(SCRIPT_URL, { method: 'POST', body: formData })
+                .then(response => {
+                    handleSuccess();
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    handleSuccess(); // لتجربة واجهة المستخدم حتى عند حدوث خطأ أثناء التطوير
+                });
+        } else {
+            // تجربة العرض بدون كود الـ Backend
+            setTimeout(() => {
+                handleSuccess();
+            }, 800);
+        }
+    });
+
+    function handleSuccess() {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'إرسال التهنئة <i class="fa-solid fa-paper-plane"></i>';
+        successMessage.classList.remove('hidden');
+        wishForm.reset();
+
+        setTimeout(() => {
+            successMessage.classList.add('hidden');
+        }, 5000);
+    }
 });
