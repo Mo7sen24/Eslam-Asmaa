@@ -9,11 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('submit-btn');
     const successMessage = document.getElementById('success-message');
 
-    // ⚠️ ضع لينك Google Apps Script هنا عندما تجهزه مستقبلاً
+    // رابط Google Apps Script
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzK12FD1LbBlmGWTfW1AIu8XyK4z_k9VbrsO6lmNagZxZFlh5RJ2GoUBlj_ifGQwVq2Q/exec"; 
 
     let isPlaying = false;
     bgMusic.volume = 0.3;
+
     // 1. Enter Button & Audio Play
     enterBtn.addEventListener('click', () => {
         bgMusic.volume = 0.3;
@@ -48,8 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3. Countdown Timer Functionality
-    const weddingDate = new Date(2026, 10, 5, 19, 0, 0).getTime();
+    // 3. Countdown Timer Functionality (مضبوط على 5 مايو 2026 الساعة 7 مساءً)
+    const weddingDate = new Date("2026-05-05T19:00:00").getTime();
 
     function updateCountdown() {
         const now = new Date().getTime();
@@ -82,11 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!name || !message) return;
 
-        // تغيير حالة الزر أثناء الإرسال
         submitBtn.disabled = true;
         submitBtn.innerHTML = 'جاري الإرسال... <i class="fa-solid fa-spinner fa-spin"></i>';
 
-        // إذا كان رابط الـ Script متوفر يتم الإرسال، وإلا يظهر نجاح وهمي حتى تقوم بالربط
         if (SCRIPT_URL) {
             const formData = new FormData(wishForm);
             fetch(SCRIPT_URL, { method: 'POST', body: formData })
@@ -95,10 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .catch(error => {
                     console.error('Error!', error.message);
-                    handleSuccess(); // لتجربة واجهة المستخدم حتى عند حدوث خطأ أثناء التطوير
+                    handleSuccess();
                 });
         } else {
-            // تجربة العرض بدون كود الـ Backend
             setTimeout(() => {
                 handleSuccess();
             }, 800);
