@@ -4,36 +4,52 @@ document.addEventListener('DOMContentLoaded', () => {
     // استبدل هذا الرابط برابط Web App الخاص بك من Google Apps Script
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHUOn5-YvzjJS-_bDd-ebl7Ii0BD9BcqL07lG4LL722b1SK5M3t1TjyHz67AxUvfJOFA/exec';
 
-
-    // --- 2. إدارة تشغيل الصوت ---
+// --- إدارة تشغيل الصوت وشاشة الدخول ---
     const audio = document.getElementById('wedding-audio');
     const enterBtn = document.getElementById('enter-btn');
     const welcomeOverlay = document.getElementById('welcome-overlay');
     const audioToggleBtn = document.getElementById('audio-toggle-btn');
     let isPlaying = false;
 
-    enterBtn.addEventListener('click', () => {
-        welcomeOverlay.style.display = 'none';
-        playAudio();
-    });
+    if (enterBtn && welcomeOverlay) {
+        enterBtn.addEventListener('click', () => {
+            // إخفاء الشاشة فوراً
+            welcomeOverlay.style.display = 'none';
+            
+            // محاولة تشغيل الصوت بشكل منفصل
+            if (audio) {
+                playAudio();
+            }
+        });
+    }
 
-    audioToggleBtn.addEventListener('click', () => {
-        if (isPlaying) {
-            audio.pause();
-            audioToggleBtn.innerHTML = '<i class="fa-solid fa-music-slash"></i>';
-            isPlaying = false;
-        } else {
-            playAudio();
-        }
-    });
+    if (audioToggleBtn) {
+        audioToggleBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                audioToggleBtn.innerHTML = '<i class="fa-solid fa-music-slash"></i>';
+                isPlaying = false;
+            } else {
+                playAudio();
+            }
+        });
+    }
 
     function playAudio() {
-        audio.play().then(() => {
-            isPlaying = true;
-            audioToggleBtn.innerHTML = '<i class="fa-solid fa-music"></i>';
-        }).catch(err => {
-            console.log("Audio play deferred:", err);
-        });
+        if (!audio) return;
+        
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                isPlaying = true;
+                if (audioToggleBtn) {
+                    audioToggleBtn.innerHTML = '<i class="fa-solid fa-music"></i>';
+                }
+            }).catch(err => {
+                console.log("تعذر تشغيل الصوت تلقائياً:", err);
+                isPlaying = false;
+            });
+        }
     }
 
 
