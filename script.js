@@ -1,115 +1,111 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Elements
-    const splashScreen = document.getElementById('splash-screen');
+
+    // --- 1. إعدادات رابط Google Apps Script ---
+    // استبدل هذا الرابط برابط Web App الخاص بك من Google Apps Script
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZmtocSbyFnW4OadJR5rMK0viqGTiwkSll95mKpfFDHnWTzjNiJIJn2PzT0kj6BUerCw/exec';
+
+
+    // --- 2. إدارة تشغيل الصوت ---
+    const audio = document.getElementById('wedding-audio');
     const enterBtn = document.getElementById('enter-btn');
-    const mainContent = document.getElementById('main-content');
-    const bgMusic = document.getElementById('bg-music');
-    const musicToggle = document.getElementById('music-toggle');
-    const wishForm = document.getElementById('wish-form');
-    const submitBtn = document.getElementById('submit-btn');
-    const successMessage = document.getElementById('success-message');
-
-    // رابط Google Apps Script
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw-7KHr9fttvVmnXiigA89on4N0XjZdhqGdy1hGaFoyg_GjGYtvKvJUfiPVkKPz2LtnrA/exec"; 
-
+    const welcomeOverlay = document.getElementById('welcome-overlay');
+    const audioToggleBtn = document.getElementById('audio-toggle-btn');
     let isPlaying = false;
-    bgMusic.volume = 0.3;
 
-    // 1. Enter Button & Audio Play
     enterBtn.addEventListener('click', () => {
-        bgMusic.volume = 0.3;
-        bgMusic.play().then(() => {
-            isPlaying = true;
-            musicToggle.classList.remove('hidden');
-        }).catch(err => {
-            console.log("Audio play failed automatically:", err);
-            isPlaying = false;
-            musicToggle.classList.remove('hidden');
-        });
-
-        splashScreen.classList.add('fade-out');
-        
-        setTimeout(() => {
-            splashScreen.style.display = 'none';
-            mainContent.classList.remove('hidden');
-        }, 1000);
+        welcomeOverlay.style.display = 'none';
+        playAudio();
     });
 
-    // 2. Music Toggle Floating Button
-    musicToggle.addEventListener('click', () => {
+    audioToggleBtn.addEventListener('click', () => {
         if (isPlaying) {
-            bgMusic.pause();
-            musicToggle.querySelector('i').className = 'fa-solid fa-compact-disc';
+            audio.pause();
+            audioToggleBtn.innerHTML = '<i class="fa-solid fa-music-slash"></i>';
             isPlaying = false;
         } else {
-            bgMusic.volume = 0.3;
-            bgMusic.play();
-            musicToggle.querySelector('i').className = 'fa-solid fa-compact-disc fa-spin';
-            isPlaying = true;
+            playAudio();
         }
     });
 
-    // 3. Countdown Timer Functionality (مضبوط على 5 نوفمبر 2026 الساعة 7 مساءً)
-    const weddingDate = new Date("2026-11-05T19:00:00").getTime();
-
-    function updateCountdown() {
-        const now = new Date().getTime();
-        const difference = weddingDate - now;
-
-        if (difference > 0) {
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-            document.getElementById('days').innerText = days < 10 ? '0' + days : days;
-            document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
-            document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
-            document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
-        } else {
-            document.getElementById('countdown').innerHTML = "<h3 style='color: var(--dark-pink);'>تم بحمد الله عقد القران! 🎉</h3>";
-        }
+    function playAudio() {
+        audio.play().then(() => {
+            isPlaying = true;
+            audioToggleBtn.innerHTML = '<i class="fa-solid fa-music"></i>';
+        }).catch(err => {
+            console.log("Audio play deferred:", err);
+        });
     }
 
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
 
-    // 4. Send Wishes Form to Google Sheets
-    wishForm.addEventListener('submit', (e) => {
+    // --- 3. العداد التنازلي ---
+    // تم ضبط تاريخ الزفاف على 15 نوفمبر 2026 الساعة 8 مساءً
+    const weddingDate = new Date("2026-11-05T20:00:00").getTime();
+
+    const timer = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = weddingDate - now;
+
+        if (distance < 0) {
+            clearInterval(timer);
+            document.getElementById('countdown').innerHTML = "<h4>أهلاً بكم في زفافنا اليوم!</h4>";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+        document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+        document.getElementById('minutes').innerText = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById('seconds').innerText = seconds < 10 ? '0' + seconds : seconds;
+    }, 1000);
+
+
+    // --- 4. إرسال نموذج التهاني ---
+    const wishForm = document.getElementById('wishForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    wishForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        const name = document.getElementById('guest-name').value.trim();
-        const message = document.getElementById('guest-message').value.trim();
+        const name = document.getElementById('guestName').value.trim();
+        const message = document.getElementById('guestMessage').value.trim();
 
-        if (!name || !message) return;
+        if (!name || !message) {
+            alert('يرجى ملء جميع الحقول');
+            return;
+        }
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = 'جاري الإرسال... <i class="fa-solid fa-spinner fa-spin"></i>';
+        submitBtn.innerText = 'جاري الإرسال...';
 
-        const formData = new FormData(wishForm);
+        const payload = {
+            name: name,
+            message: message
+        };
 
         fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors',
-            body: formData
+            mode: 'no-cors', // لضمان إرسال الطلب لـ Apps Script بدون مشاكل Cross-Origin
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
         })
         .then(() => {
-            handleSuccess();
+            alert('شكراً لك! تم إرسال تهنئتك بنجاح.');
+            wishForm.reset();
         })
         .catch(error => {
-            console.error('Error!', error.message);
-            handleSuccess();
+            console.error('Error:', error);
+            alert('حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'إرسال التهنئة';
         });
     });
 
-    function handleSuccess() {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'إرسال التهنئة <i class="fa-solid fa-paper-plane"></i>';
-        successMessage.classList.remove('hidden');
-        wishForm.reset();
-
-        setTimeout(() => {
-            successMessage.classList.add('hidden');
-        }, 5000);
-    }
 });
