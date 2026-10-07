@@ -16,49 +16,57 @@ document.addEventListener('DOMContentLoaded', () => {
     bgMusic.volume = 0.3;
 
     // ===============================================
-    // 🚀 بداية متغيرة وشغالة للتمرير التلقائي (Auto Scroll)
+    // 🚀 كود Auto Scroll المحسّن للموبايل والكمبيوتر
     // ===============================================
-    let autoScrollInterval = null;
-    const scrollSpeed = 1; // زيادة أو تقليل الرقم للتحكم في السرعة
+    let isAutoScrolling = false;
+    let animationFrameId = null;
+    const scrollSpeed = 0.8; // سرعة التمرير (يمكنك تقليلها إلى 0.5 لتكون أبطأ أو زيادتها)
 
-    function startAutoScroll() {
-        if (autoScrollInterval) return;
+    function autoScrollStep() {
+        if (!isAutoScrolling) return;
 
-        autoScrollInterval = setInterval(() => {
-            window.scrollBy({
-                top: scrollSpeed,
-                behavior: 'smooth'
-            });
+        // تحريك الشاشة لأسفل
+        window.scrollBy(0, scrollSpeed);
 
-            // لو الصفحة وصلت للآخر خالص يتوقف السكرول
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 5) {
-                stopAutoScroll();
-            }
-        }, 30); // معدل التكرار (كل 30 مللي ثانية)
-    }
+        // التحقق مما إذا كانت الصفحة وصلت للنهاية
+        const reachedBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 5);
 
-    function stopAutoScroll() {
-        if (autoScrollInterval) {
-            clearInterval(autoScrollInterval);
-            autoScrollInterval = null;
+        if (reachedBottom) {
+            stopAutoScroll();
+        } else {
+            // استدعاء الفريم التالي لضمان حركة سلسة على الهواتف
+            animationFrameId = requestAnimationFrame(autoScrollStep);
         }
     }
 
-    // إيقاف السكرول لو المستخدم اتفاعل بيده (ماوس، لمس، أو أسهم الكيبورد)
+    function startAutoScroll() {
+        if (isAutoScrolling) return;
+        isAutoScrolling = true;
+        animationFrameId = requestAnimationFrame(autoScrollStep);
+    }
+
+    function stopAutoScroll() {
+        if (!isAutoScrolling) return;
+        isAutoScrolling = false;
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+    }
+
+    // إيقاف السكرول فقط عند التفاعل الفعلي (سحب الشاشة بـ touchmove بدلاً من مجرد اللمس)
     window.addEventListener('wheel', stopAutoScroll, { passive: true });
-    window.addEventListener('touchstart', stopAutoScroll, { passive: true });
+    window.addEventListener('touchmove', stopAutoScroll, { passive: true });
     window.addEventListener('keydown', (e) => {
         if (['ArrowUp', 'ArrowDown', 'Space', 'PageUp', 'PageDown'].includes(e.code)) {
             stopAutoScroll();
         }
     });
 
-    // إيقاف السكرول لو الضيف بدأ يكتب في فورم التهاني
+    // إيقاف السكرول لو الضيف بدأ يكتب في النموذج
     if (wishForm) {
         wishForm.addEventListener('focusin', stopAutoScroll);
     }
     // ===============================================
-
 
     // 1. Enter Button & Audio Play
     enterBtn.addEventListener('click', () => {
@@ -78,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             splashScreen.style.display = 'none';
             mainContent.classList.remove('hidden');
 
-            // 🎯 تشغيل السكرول التلقائي بعد ما المحتوى الرئيسي يظهر
+            // 🎯 تشغيل السكرول التلقائي بعد ظهور المحتوى الرئيسي
             startAutoScroll();
         }, 1000);
     });
