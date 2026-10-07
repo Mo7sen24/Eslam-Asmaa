@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ===============================================
     let isAutoScrolling = false;
     let animationFrameId = null;
-    const scrollSpeed = 0.8; // سرعة التمرير (يمكنك تقليلها إلى 0.5 لتكون أبطأ أو زيادتها)
+    const scrollSpeed = 0.4; // سرعة التمرير (يمكنك تقليلها إلى 0.5 لتكون أبطأ أو زيادتها)
 
     function autoScrollStep() {
         if (!isAutoScrolling) return;
