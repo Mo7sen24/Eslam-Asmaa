@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let animationFrameId = null;
 
-    const scrollSpeed = 0.5; // سرعة التمرير (يمكنك تقليلها إلى 0.5 لتكون أبطأ أو زيادتها)
+    const scrollSpeed = 0.4; // سرعة التمرير (يمكنك تقليلها إلى 0.5 لتكون أبطأ أو زيادتها)
 
 
 
