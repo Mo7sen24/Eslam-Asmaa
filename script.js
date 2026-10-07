@@ -14,6 +14,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isPlaying = false;
     bgMusic.volume = 0.3;
+
+    // ===============================================
+    // 🚀 بداية متغيرة وشغالة للتمرير التلقائي (Auto Scroll)
+    // ===============================================
+    let autoScrollInterval = null;
+    const scrollSpeed = 1; // زيادة أو تقليل الرقم للتحكم في السرعة
+
+    function startAutoScroll() {
+        if (autoScrollInterval) return;
+
+        autoScrollInterval = setInterval(() => {
+            window.scrollBy({
+                top: scrollSpeed,
+                behavior: 'smooth'
+            });
+
+            // لو الصفحة وصلت للآخر خالص يتوقف السكرول
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 5) {
+                stopAutoScroll();
+            }
+        }, 30); // معدل التكرار (كل 30 مللي ثانية)
+    }
+
+    function stopAutoScroll() {
+        if (autoScrollInterval) {
+            clearInterval(autoScrollInterval);
+            autoScrollInterval = null;
+        }
+    }
+
+    // إيقاف السكرول لو المستخدم اتفاعل بيده (ماوس، لمس، أو أسهم الكيبورد)
+    window.addEventListener('wheel', stopAutoScroll, { passive: true });
+    window.addEventListener('touchstart', stopAutoScroll, { passive: true });
+    window.addEventListener('keydown', (e) => {
+        if (['ArrowUp', 'ArrowDown', 'Space', 'PageUp', 'PageDown'].includes(e.code)) {
+            stopAutoScroll();
+        }
+    });
+
+    // إيقاف السكرول لو الضيف بدأ يكتب في فورم التهاني
+    if (wishForm) {
+        wishForm.addEventListener('focusin', stopAutoScroll);
+    }
+    // ===============================================
+
+
     // 1. Enter Button & Audio Play
     enterBtn.addEventListener('click', () => {
         bgMusic.volume = 0.3;
@@ -31,6 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             splashScreen.style.display = 'none';
             mainContent.classList.remove('hidden');
+
+            // 🎯 تشغيل السكرول التلقائي بعد ما المحتوى الرئيسي يظهر
+            startAutoScroll();
         }, 1000);
     });
 
