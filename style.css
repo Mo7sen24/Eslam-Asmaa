@@ -152,7 +152,7 @@ body {
 
 .couple-names {
     font-family: 'Reem Kufi', cursive;
-    font-size: 1rem;
+    font-size: 2.5rem;
     color: var(--dark-pink);
     margin: 20px 0;
 }
@@ -463,7 +463,7 @@ body {
 
 /* Responsive */
 @media (max-width: 600px) {
-    .couple-names { font-size: 2.5rem; }
+    .couple-names { font-size: 1.5rem; }
     .splash-content h1 { font-size: 2.2rem; }
     .countdown-grid { gap: 10px; }
     .time-box { min-width: 60px; }
