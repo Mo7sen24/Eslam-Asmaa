@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const successMessage = document.getElementById('success-message');
 
     // ⚠️ ضع لينك Google Apps Script هنا عندما تجهزه مستقبلاً
-    const SCRIPT_URL = ""; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPqMq0SQ9xPrD83ahZb_gR8fzi5zeqfimQx1KaE4UVYJPb2nWGl8BN-OSfjvnKOXGr/exec"; 
 
     let isPlaying = false;
     bgMusic.volume = 0.3;
@@ -131,45 +131,66 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCountdown();
 
     // 4. Send Wishes Form to Google Sheets
-    wishForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+// 4. Send Wishes Form to Google Sheets
 
-        const name = document.getElementById('guest-name').value.trim();
-        const message = document.getElementById('guest-message').value.trim();
+wishForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-        if (!name || !message) return;
+    const name = document.getElementById('guest-name').value.trim();
+    const message = document.getElementById('guest-message').value.trim();
 
-        // تغيير حالة الزر أثناء الإرسال
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = 'جاري الإرسال... <i class="fa-solid fa-spinner fa-spin"></i>';
+    if (!name || !message) {
+        return;
+    }
 
-        // إذا كان رابط الـ Script متوفر يتم الإرسال، وإلا يظهر نجاح وهمي حتى تقوم بالربط
-        if (SCRIPT_URL) {
-            const formData = new FormData(wishForm);
-            fetch(SCRIPT_URL, { method: 'POST', body: formData })
-                .then(response => {
-                    handleSuccess();
-                })
-                .catch(error => {
-                    console.error('Error!', error.message);
-                    handleSuccess(); // لتجربة واجهة المستخدم حتى عند حدوث خطأ أثناء التطوير
-                });
+    // منع الضغط أكثر من مرة أثناء الإرسال
+    submitBtn.disabled = true;
+    submitBtn.innerHTML =
+        'جاري الإرسال... <i class="fa-solid fa-spinner fa-spin"></i>';
+
+    try {
+        const formData = new FormData();
+
+        formData.append('name', name);
+        formData.append('message', message);
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            handleSuccess();
         } else {
-            // تجربة العرض بدون كود الـ Backend
-            setTimeout(() => {
-                handleSuccess();
-            }, 800);
+            throw new Error(result.error || 'حدث خطأ أثناء الإرسال');
         }
-    });
 
-    function handleSuccess() {
+    } catch (error) {
+
+        console.error('Error:', error);
+
         submitBtn.disabled = false;
-        submitBtn.innerHTML = 'إرسال التهنئة <i class="fa-solid fa-paper-plane"></i>';
-        successMessage.classList.remove('hidden');
-        wishForm.reset();
+        submitBtn.innerHTML =
+            'إرسال التهنئة <i class="fa-solid fa-paper-plane"></i>';
 
-        setTimeout(() => {
-            successMessage.classList.add('hidden');
-        }, 5000);
+        alert('حدث خطأ أثناء إرسال التهنئة. حاول مرة أخرى.');
     }
 });
+
+function handleSuccess() {
+
+    submitBtn.disabled = false;
+
+    submitBtn.innerHTML =
+        'إرسال التهنئة <i class="fa-solid fa-paper-plane"></i>';
+
+    successMessage.classList.remove('hidden');
+
+    wishForm.reset();
+
+    setTimeout(() => {
+        successMessage.classList.add('hidden');
+    }, 5000);
+}
